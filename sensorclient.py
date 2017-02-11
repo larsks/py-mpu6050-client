@@ -1,39 +1,7 @@
-import cStringIO as StringIO
 import json
 import select
-import six
 import socket
 import time
-import zmq
-
-class ZMQClient(object):
-    def __init__(self, src):
-        self.src = src
-        self.init_zmq()
-        self.init_socket()
-
-    def init_zmq(self):
-        self.ctx = zmq.Context()
-
-    def init_socket(self):
-        self.socket = self.ctx.socket(zmq.SUB)
-        self.socket.setsockopt(
-            zmq.SUBSCRIBE,
-            six.binary_type(''))
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self.next()
-
-    def next(self):
-        self.socket.connect(self.src)
-        while True:
-            data = json.loads(self.socket.recv())
-            return dict(zip(
-                ['yaw', 'pitch', 'roll', 'temp'],
-                data))
 
 class SocketClient(object):
     def __init__(self, src, blksize=8192):
