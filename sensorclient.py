@@ -23,8 +23,8 @@ class SocketClient(object):
         while True:
             print 'connecting to {}'.format(self.src)
             try:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect(self.src)
+                sock = socket.create_connection(self.src, timeout=10)
+                print 'connected!'
             except socket.error as exc:
                 print 'error {} connecting to socket; retrying...'.format(exc)
                 time.sleep(1)
@@ -41,18 +41,16 @@ class SocketClient(object):
         poll.register(sock, select.POLLIN|select.POLLHUP)
 
         buf = ''
-        lastread = time.time()
 
         while True:
-            ready = poll.poll(1000)
-            if not ready and (time.time() - lastread > 2):
+            ready = poll.poll(2000)
+            if not ready:
                 break
 
             for obj, event in ready:
                 if event & select.POLLHUP:
                     return
                 elif event & select.POLLIN:
-                    lastread=time.time()
                     data = sock.recv(self.blksize)
                     buf += data
 
