@@ -4,7 +4,7 @@ import socket
 import time
 
 class SocketClient(object):
-    def __init__(self, src, blksize=8192):
+    def __init__(self, src, blksize=1024):
         self.src = src
         self.blksize = blksize
 
