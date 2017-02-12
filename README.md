@@ -7,6 +7,21 @@ visualiztion data from an MPU6050 6DOF IMU provided by the
 [vispy]: http://vispy.org/
 [py-mpu6050]: https://github.com/larsks/py-mpu6050
 
+## Installing
+
+From inside the project directory, you can run:
+
+    pip install .
+
+## Usage
+
+Provide an address and port to the `sensorclient` script:
+
+    sensorclient 192.168.4.1:80000
+
+This will display a 3D cube on your screen that responds to movements
+of the device running [py-mpu6050][].
+
 ## License
 
 py-mpu6050-client -- visualization for py-mpu6050  
