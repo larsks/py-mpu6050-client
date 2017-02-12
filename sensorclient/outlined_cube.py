@@ -106,6 +106,7 @@ class Canvas(app.Canvas):
     def on_timer(self, event):
         if self.sensor is not None:
             self.theta, self.phi, _ = next(self.sensor)
+            self.theta = -self.theta
         else:
             self.theta += .5
             self.phi += .5
