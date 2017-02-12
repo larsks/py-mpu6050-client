@@ -43,11 +43,12 @@ void main()
 
 
 class Canvas(app.Canvas):
-    def __init__(self, sensor=None):
-        app.Canvas.__init__(self, size=(800, 800), title='Rotating cube',
+    def __init__(self, sensor=None, i=0, title='Rotating Cube'):
+        app.Canvas.__init__(self, size=(640, 640), title=title,
                             keys='interactive')
         self.timer = app.Timer('auto', self.on_timer)
         self.sensor = sensor
+        self.i = i
 
         # Build cube data
         V, I, O = create_cube()
@@ -105,7 +106,7 @@ class Canvas(app.Canvas):
 
     def on_timer(self, event):
         if self.sensor is not None:
-            self.theta, self.phi, _ = next(self.sensor)
+            self.theta, self.phi, _ = next(self.sensor)[self.i]
             self.theta = -self.theta
         else:
             self.theta += .5

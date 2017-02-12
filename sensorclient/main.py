@@ -15,5 +15,7 @@ def main():
     host, port = args.sensor.split(':')
     sensor = (host, int(port))
     s = sensorclient.SocketClient(sensor)
-    c = outlined_cube.Canvas(sensor=s)
+    c1 = outlined_cube.Canvas(sensor=s, i=0, title='Filtered')
+    c2 = outlined_cube.Canvas(sensor=s, i=1, title='Accelerometer')
+    c3 = outlined_cube.Canvas(sensor=s, i=2, title='Gyro')
     app.run()
