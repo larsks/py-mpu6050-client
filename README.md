@@ -1,7 +1,7 @@
 # py-mpu6050-client
 
 This package provides `sensorclient`, a [vispy][]-based tool for
-visualiztion data from an MPU6050 6DOF IMU provided by the
+visualizing data from an MPU6050 6DOF IMU provided by the
 [py-mpu6050][] project.
 
 [vispy]: http://vispy.org/
@@ -15,12 +15,20 @@ From inside the project directory, you can run:
 
 ## Usage
 
-Provide an address and port to the `sensorclient` script:
+Run `sensorclient`:
 
-    sensorclient 192.168.4.1:80000
+    sensorclient
 
-This will display a 3D cube on your screen that responds to movements
-of the device running [py-mpu6050][].
+This will listen on a UDP socket (by default port `8000`) for data
+from the MPU6050.
+
+It will display 3D cubes on your screen that track movements
+of the device running [py-mpu6050][].  By default you will get one
+cube each for accelerometer data, gyroscope data, and data computed by
+the complementary filter.  You may select a subset of these using the
+`--gyro`, `--accel`, and `--filtered` command line options:
+
+    sensorclient --accel
 
 ## License
 

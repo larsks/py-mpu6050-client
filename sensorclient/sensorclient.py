@@ -3,58 +3,38 @@ import select
 import socket
 import time
 
-class SocketClient(object):
-    def __init__(self, src, blksize=1024):
-        self.src = src
-        self.blksize = blksize
+default_port = 8000
+default_listen_addr = '0.0.0.0'
+default_blksize = 1024
 
-        self._values = self.values()
-
-    def __iter__(self):
-        return self._values
-
-    def __next__(self):
-        return self.next()
-
-    def next(self):
-        return next(self._values)
-
-    def values(self):
+def sensorclient(listen_addr=default_listen_addr,
+                 port=default_port,
+                 blksize=default_blksize):
+        print 'listening for data on {}:{}'.format(listen_addr, port)
         while True:
-            print 'connecting to {}'.format(self.src)
-            try:
-                sock = socket.create_connection(self.src, timeout=10)
-                print 'connected!'
-            except socket.error as exc:
-                print 'error {} connecting to socket; retrying...'.format(exc)
-                time.sleep(1)
-                continue
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind((listen_addr, port))
+            buf = ''
+            poll = select.poll()
+            poll.register(sock, select.POLLIN)
+            vals = [[0,0,0]] * 3
 
-            for value in self.clientloop(sock):
-                yield value
+            while True:
+                ready = poll.poll(10)
+
+                # in the absence of any new data, continue to yield
+                # the last value to client code.  This prevents the
+                # vispy UI from blocking.
+                if not ready:
+                    yield vals
+                    continue
+
+                data, saddr = sock.recvfrom(blksize)
+                buf += data
+
+                while '\n' in buf:
+                    line, buf = buf.split('\n', 1)
+                    vals = json.loads(line)
+                    yield vals
 
             sock.close()
-            time.sleep(1)
-
-    def clientloop(self, sock):
-        poll = select.poll()
-        poll.register(sock, select.POLLIN|select.POLLHUP)
-
-        buf = ''
-
-        while True:
-            ready = poll.poll(2000)
-            if not ready:
-                break
-
-            for obj, event in ready:
-                if event & select.POLLHUP:
-                    return
-                elif event & select.POLLIN:
-                    data = sock.recv(self.blksize)
-                    buf += data
-
-                    while '\n' in buf:
-                        line, buf = buf.split('\n', 1)
-                        vals = json.loads(line)
-                        yield vals

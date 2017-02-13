@@ -1,21 +1,30 @@
-from vispy import gloo, app
+from vispy import app
 import argparse
 import sensorclient
 import outlined_cube
 
 def parse_args():
     p = argparse.ArgumentParser()
+    p.add_argument('--gyro', dest='inputs',
+                   action='append_const', const='gyro')
+    p.add_argument('--accel', dest='inputs',
+                   action='append_const', const='accel')
+    p.add_argument('--filtered', dest='inputs',
+                   action='append_const', const='filtered')
+    p.add_argument('--listen', '-l', default='0.0.0.0')
 
-    p.add_argument('sensor')
-
+    p.set_defaults(inputs=None)
     return p.parse_args()
 
 def main():
     args = parse_args()
-    host, port = args.sensor.split(':')
-    sensor = (host, int(port))
-    s = sensorclient.SocketClient(sensor)
-    c1 = outlined_cube.Canvas(sensor=s, i=0, title='Filtered')
-    c2 = outlined_cube.Canvas(sensor=s, i=1, title='Accelerometer')
-    c3 = outlined_cube.Canvas(sensor=s, i=2, title='Gyro')
+    s = sensorclient.sensorclient(listen_addr=args.listen)
+
+    if args.inputs is None or 'filtered' in args.inputs:
+        c1 = outlined_cube.Canvas(sensor=s, i=0, title='Filtered')
+    if args.inputs is None or 'accel' in args.inputs:
+        c2 = outlined_cube.Canvas(sensor=s, i=1, title='Accelerometer')
+    if args.inputs is None or 'gyro' in args.inputs:
+        c3 = outlined_cube.Canvas(sensor=s, i=2, title='Gyro')
+
     app.run()
