@@ -68,7 +68,7 @@ class Canvas(app.Canvas):
 
         self.program['u_model'] = model
         self.program['u_view'] = view
-        self.phi, self.theta = 0, 0
+        self.theta, self.psi, self.phi = 0, 0, 0
 
         self.activate_zoom()
 
@@ -106,12 +106,16 @@ class Canvas(app.Canvas):
 
     def on_timer(self, event):
         if self.sensor is not None:
-            self.theta, self.phi, _ = next(self.sensor)[self.i]
+            self.theta, self.psi, self.phi = next(self.sensor)[self.i]
             self.theta = -self.theta
         else:
             self.theta += .5
             self.phi += .5
-        self.program['u_model'] = np.dot(rotate(self.theta, (1, 0, 0)),
-                                         rotate(self.phi, (0, 0, 1)))
+#        self.program['u_model'] = np.dot(rotate(self.theta, (1, 0, 0)),
+#                                         rotate(self.phi, (0, 0, 1)))
+        self.program['u_model'] = np.dot(
+            rotate(self.theta, (1, 0, 0)), np.dot(
+                rotate(self.phi, (0, 1, 0)),
+                rotate(self.psi, (0, 0, 1))))
         self.update()
 
