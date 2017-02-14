@@ -29,6 +29,6 @@ def main():
                                   yaw=args.yaw, title='Accelerometer')
     if args.inputs is None or 'gyro' in args.inputs:
         c3 = outlined_cube.Canvas(sensor=s, i=2,
-                                  yaw=args.yaw, title='Gyro')
+                                  yaw=args.yaw, title='Gyroscope')
 
     app.run()
