@@ -43,12 +43,13 @@ void main()
 
 
 class Canvas(app.Canvas):
-    def __init__(self, sensor=None, i=0, title='Rotating Cube'):
+    def __init__(self, sensor=None, i=0, yaw=False, title='Rotating Cube'):
         app.Canvas.__init__(self, size=(640, 640), title=title,
                             keys='interactive')
         self.timer = app.Timer('auto', self.on_timer)
         self.sensor = sensor
         self.i = i
+        self.yaw = yaw
 
         # Build cube data
         V, I, O = create_cube()
@@ -106,13 +107,20 @@ class Canvas(app.Canvas):
 
     def on_timer(self, event):
         if self.sensor is not None:
-            self.theta, self.psi, self.phi = next(self.sensor)[self.i]
+            data = next(self.sensor)
+            self.theta, self.psi, self.phi = data[self.i]
             self.theta = -self.theta
+
+            # read yaw from gyro
+            if self.yaw:
+                self.phi = data[2][2]
+            else:
+                self.phi = 0
         else:
             self.theta += .5
             self.phi += .5
 #        self.program['u_model'] = np.dot(rotate(self.theta, (1, 0, 0)),
-#                                         rotate(self.phi, (0, 0, 1)))
+#                                         rotate(self.psi, (0, 0, 1)))
         self.program['u_model'] = np.dot(
             rotate(self.theta, (1, 0, 0)), np.dot(
                 rotate(self.phi, (0, 1, 0)),
